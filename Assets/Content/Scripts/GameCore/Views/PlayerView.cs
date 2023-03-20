@@ -1,4 +1,5 @@
 using System;
+using Content.Scripts.Base.Enums;
 using Content.Scripts.Base.Interfaces;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
@@ -12,7 +13,8 @@ namespace Content.Scripts.GameCore.Views
         public Action<float> OnDecelerate;
         public Action<Vector2> OnLaserShoot;
         public Action OnBulletShoot;
-        public Action OnDead;
+        public Action<Vector2, float> OnUpdatePosition;
+        public Action<MemberType> OnDeath;
 
         private float _axisValue;
         private bool _decelerate = true;
@@ -20,6 +22,8 @@ namespace Content.Scripts.GameCore.Views
 
         private void Update()
         {
+            OnUpdatePosition?.Invoke(transform.position, Time.deltaTime);
+            
             if (!_decelerate)
             {
                 OnAccelerate?.Invoke(Time.deltaTime);
@@ -38,9 +42,11 @@ namespace Content.Scripts.GameCore.Views
         private void OnTriggerEnter2D(Collider2D targetCollider)
         {
             var enemy = targetCollider.GetComponent<PoolMember>();
-
-            if (enemy != null)
-                OnDead?.Invoke();
+            
+            if (enemy.MemberType != MemberType.None)
+            {
+                OnDeath?.Invoke(enemy.MemberType);
+            }
         }
 
         public void Initialize()

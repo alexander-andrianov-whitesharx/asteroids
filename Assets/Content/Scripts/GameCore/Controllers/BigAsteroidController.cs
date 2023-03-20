@@ -1,17 +1,54 @@
-namespace Content.Scripts.GameCore.ViewModels
+using System;
+using Content.Scripts.GameCore.Models;
+using Content.Scripts.GameCore.Views;
+using UnityEngine;
+
+namespace Content.Scripts.GameCore.Controllers
 {
-    public class BigAsteroidController
+    public class BigAsteroidController : IDisposable
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        public Action<BigAsteroidView, BigAsteroidController, Vector2> OnDestroyView;
         
+        private BigAsteroidView _bigAsteroidView;
+        private BigAsteroidModel _bigAsteroidModel;
+        
+        public BigAsteroidController(BigAsteroidView view, BigAsteroidModel model)
+        {
+            _bigAsteroidView = view;
+            _bigAsteroidModel = model;
+
+            InitializeListeners();
+        }
+        
+        private void InitializeListeners()
+        {
+            _bigAsteroidView.OnMove += OnUpdateViewPosition;
+            _bigAsteroidView.OnDestroy += OnDestroy;
+            _bigAsteroidModel.OnPositionUpdate += OnUpdateModelPosition;
+        }
+        
+        private void OnUpdateViewPosition(Vector2 position, float delta)
+        {
+            _bigAsteroidModel.MoveForward(position, delta);
         }
 
-        // Update is called once per frame
-        void Update()
+        private void OnUpdateModelPosition(Vector2 position)
         {
+            _bigAsteroidView.SetPosition(position);
+        }
         
+        private void OnDestroy()
+        {
+            OnDestroyView?.Invoke(_bigAsteroidView, this, _bigAsteroidModel.Direction);
+        }
+
+        public void Dispose()
+        {
+            _bigAsteroidView.OnMove -= OnUpdateViewPosition;
+            _bigAsteroidView.OnDestroy -= OnDestroy;
+            _bigAsteroidModel.OnPositionUpdate -= OnUpdateModelPosition;
+
+            _bigAsteroidModel.Dispose();
         }
     }
 }

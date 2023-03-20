@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace Content.Scripts.GameCore.Controllers
 {
-    public class BulletController
+    public class BulletController : IDisposable
     {
         public Action<BulletController> OnBulletDespawn;
         
-        private BulletModel _bulletModel;
-        private BulletView _bulletView;
+        private readonly BulletModel _bulletModel;
+        private readonly BulletView _bulletView;
 
         public BulletView BulletView => _bulletView;
         
@@ -25,6 +25,7 @@ namespace Content.Scripts.GameCore.Controllers
         private void InitializeListeners()
         {
             _bulletView.OnMove += OnUpdateViewPosition;
+            _bulletView.OnDestroy += OnBulletOutsideViewport;
             _bulletModel.OnPositionUpdate += OnUpdateModelPosition;
             _bulletModel.OnBulletOutsideViewport += OnBulletOutsideViewport;
         }
@@ -42,6 +43,16 @@ namespace Content.Scripts.GameCore.Controllers
         private void OnBulletOutsideViewport()
         { 
             OnBulletDespawn?.Invoke(this);
+        }
+
+        public void Dispose()
+        {
+            _bulletView.OnMove -= OnUpdateViewPosition;
+            _bulletView.OnDestroy -= OnBulletOutsideViewport;
+            _bulletModel.OnPositionUpdate -= OnUpdateModelPosition;
+            _bulletModel.OnBulletOutsideViewport -= OnBulletOutsideViewport;
+
+            _bulletModel.Dispose();
         }
     }
 }

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: BigAsteroidConfig
   m_EditorClassIdentifier: 
   asteroidView: {fileID: 8246382293032563696, guid: 3cae025cdce87724ca641639a7cc9839, type: 3}
-  speed: 4
+  speed: 2.5
+  spawnDelay: 4
   rewardAmount: 50
-  poolSize: 10
+  spawnLimit: 12
+  poolSize: 15

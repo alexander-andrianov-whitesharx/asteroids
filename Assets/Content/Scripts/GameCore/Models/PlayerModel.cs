@@ -10,7 +10,7 @@ namespace Content.Scripts.GameCore.Models
         public Action OnPositionUpdate;
         public Action OnRotationUpdate;
 
-        private TeleportService _teleportService;
+        private PortalService _portalService;
         
         private Vector2 _position;
         private Vector2 _accelerationDirection;
@@ -33,9 +33,9 @@ namespace Content.Scripts.GameCore.Models
 
         public float Rotation => _rotation;
         
-        public PlayerModel(PlayerConfig config, TeleportService teleportService)
+        public PlayerModel(PlayerConfig config, PortalService portalService)
         {
-            _teleportService = teleportService;
+            _portalService = portalService;
             _movementSpeed = config.MovementSpeed;
             _rotationSpeed = config.RotationSpeed;
             _slowdownTime = config.SlowdownTime;
@@ -77,7 +77,7 @@ namespace Content.Scripts.GameCore.Models
         {
             var newPosition = _position + _localAcceleration * (_movementSpeed * deltaTime);
             _position = newPosition;
-            _position = _teleportService.CalculateNextPosition(_position);
+            _position = _portalService.CalculateNextPosition(_position);
             
             OnPositionUpdate?.Invoke();
         }

@@ -1,14 +1,16 @@
-using Content.Scripts.Base.Interfaces;
+using System;
+using Content.Scripts.Base.Enums;
+using Content.Scripts.GameCore.Entry;
 using Content.Scripts.GameCore.Models;
-using Content.Scripts.GameCore.Utils;
 using Content.Scripts.GameCore.Views;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Content.Scripts.GameCore.Controllers
 {
     public class PlayerController
     {
+        public Action OnDeath;
+        
         private PlayerModel _playerModel;
         private PlayerView _playerView;
         private GunModel _gunModel;
@@ -29,10 +31,23 @@ namespace Content.Scripts.GameCore.Controllers
             _playerView.OnAccelerate += OnUpdateModelAcceleration;
             _playerView.OnDecelerate += OnUpdateModelDeceleration;
             _playerView.OnRotate += OnUpdateModelRotation;
-            _playerView.OnDead += OnViewDeath;
+            _playerView.OnDeath += OnViewDeath;
             
             _playerModel.OnPositionUpdate += ModelPositionChanged;
             _playerModel.OnRotationUpdate += ModelRotationChanged;
+        }
+        
+        public void UnsubscribeFromListeners()
+        {
+            _playerView.OnBulletShoot -= OnUpdateModelBullet;
+            _playerView.OnLaserShoot -= OnUpdateModelLaser;
+            _playerView.OnAccelerate -= OnUpdateModelAcceleration;
+            _playerView.OnDecelerate -= OnUpdateModelDeceleration;
+            _playerView.OnRotate -= OnUpdateModelRotation;
+            _playerView.OnDeath -= OnViewDeath;
+            
+            _playerModel.OnPositionUpdate -= ModelPositionChanged;
+            _playerModel.OnRotationUpdate -= ModelRotationChanged;
         }
 
         private void OnUpdateModelAcceleration(float deltaTime)
@@ -70,10 +85,10 @@ namespace Content.Scripts.GameCore.Controllers
         { 
             _playerView.UpdateRotation(_playerModel.Rotation);
         }
-        
-        private void OnViewDeath()
+
+        private void OnViewDeath(MemberType memberType)
         {
-            //_game.GameOver();
+            OnDeath?.Invoke();
         }
     }
 }

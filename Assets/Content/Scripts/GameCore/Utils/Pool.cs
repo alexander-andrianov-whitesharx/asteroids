@@ -1,5 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using Content.Scripts.Base.Enums;
 using Content.Scripts.Base.Interfaces;
+using Content.Scripts.GameCore.Views;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Content.Scripts.GameCore.Utils
@@ -7,12 +11,14 @@ namespace Content.Scripts.GameCore.Utils
     public class Pool<T>
     {
         private Stack<T> inactive;
+        private List<T> active;
         private T prefab;
 
         public Pool(T prefab, int initialQty)
         {
             this.prefab = prefab;
             inactive = new Stack<T>(initialQty);
+            active = new List<T>();
         }
 
         public T Spawn(Transform parent, Vector3 position, Quaternion rotation)
@@ -27,11 +33,17 @@ namespace Content.Scripts.GameCore.Utils
                 currentGameObject = currentMonoBehaviour.gameObject;
                 currentObject = currentGameObject.GetComponent<T>();
                 
-                currentMonoBehaviour.gameObject.AddComponent<PoolMember>().Pool = this as Pool<IView>;
+                var poolMember = currentMonoBehaviour.gameObject.AddComponent<PoolMember>();
+                poolMember.Pool = this as Pool<IView>;
+
+                var memberType = GetMemberType(currentObject);
+                poolMember.MemberType = memberType;
             }
             else
             {
                 currentObject = inactive.Pop();
+                active.Add(currentObject);
+
                 currentGameObject = (currentObject as MonoBehaviour)!.gameObject;
 
                 if (currentObject == null)
@@ -58,22 +70,34 @@ namespace Content.Scripts.GameCore.Utils
             
             currentGameObject.gameObject.SetActive(false);
             inactive.Push(currentObject);
+            active.Remove(currentObject);
         }
         
         public void DespawnAll()
         {
-            foreach (var poolMember in inactive)
+            foreach (var poolMember in active.ToArray())
             {
-                var currentGameObject = poolMember as GameObject;
-
-                if (currentGameObject == null)
-                {
-                    continue;
-                }
-
                 Despawn(poolMember);
-                //currentGameObject.SetActive(false);
             }
+        }
+
+        private MemberType GetMemberType(T currentView)
+        {
+            var isSmall = currentView as SmallAsteroidView;
+            var isBig = currentView as BigAsteroidView;
+            var isUfo = currentView as UfoView;
+            
+            if (isSmall != null)
+            {
+                return MemberType.SmallAsteroid;
+            }
+            
+            if (isBig != null)
+            {
+                return MemberType.BigAsteroid;
+            }
+            
+            return isUfo != null ? MemberType.Ufo : MemberType.None;
         }
     }
 }

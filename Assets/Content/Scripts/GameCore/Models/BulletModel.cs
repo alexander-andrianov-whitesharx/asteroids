@@ -5,27 +5,27 @@ using UnityEngine;
 
 namespace Content.Scripts.GameCore.Models
 {
-    public class BulletModel
+    public class BulletModel : IDisposable
     {
         public Action<Vector2> OnPositionUpdate;
         public Action OnBulletOutsideViewport;
 
-        private TeleportService _teleportService;
-        private Vector2 _direction;
+        private readonly PortalService _portalService;
+        private readonly Vector2 _direction;
         
         private readonly float _speed;
         
-        public BulletModel(BulletConfig bulletConfig, Vector2 direction, TeleportService teleportService)
+        public BulletModel(BulletConfig bulletConfig, Vector2 direction, PortalService portalService)
         {
             _speed = bulletConfig.Speed;
-            _teleportService = teleportService;
+            _portalService = portalService;
             _direction = direction;
         }
         
         public void MoveForward(Vector2 position, float delta)
         {
             var nextPosition = position + _direction * (_speed * delta);
-            var isOutsideViewport = _teleportService.IsNextPosOutsideViewport(nextPosition);
+            var isOutsideViewport = _portalService.IsNextPosOutsideViewport(nextPosition);
 
             if (isOutsideViewport)
             {
@@ -35,5 +35,7 @@ namespace Content.Scripts.GameCore.Models
             
             OnPositionUpdate?.Invoke(nextPosition);
         }
+
+        public void Dispose() { }
     }
 }

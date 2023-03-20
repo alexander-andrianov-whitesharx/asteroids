@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: UfoConfig
   m_EditorClassIdentifier: 
   ufoView: {fileID: 7705167202047183460, guid: e3a2a6341035ab845a1d15ea5567097a, type: 3}
-  speed: 2
+  speed: 1.25
+  spawnDelay: 6
+  spawnLimit: 5
   rewardAmount: 100
-  poolSize: 3
+  poolSize: 5

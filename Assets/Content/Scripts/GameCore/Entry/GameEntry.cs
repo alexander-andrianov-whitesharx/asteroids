@@ -1,9 +1,12 @@
+using System;
 using Content.Scripts.Base.Interfaces;
 using Content.Scripts.Configs;
 using Content.Scripts.GameCore.Controllers;
+using Content.Scripts.GameCore.Layouts;
 using Content.Scripts.GameCore.Models;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Content.Scripts.GameCore.Entry
 {
@@ -15,7 +18,14 @@ namespace Content.Scripts.GameCore.Entry
         private const string BigAsteroidsRootName = "BigAsteroidsRoot";
         private const string BulletsRootName = "BulletsRoot";
         private const string LasersRootName = "LasersRoot";
-        
+
+        private PoolService<IView> _localPoolService;
+        private EnemyController _localEnemyController;
+        private PlayerController _localPlayerController;
+
+        private LoseLayout _loseLayout;
+        private StatisticsLayout _statisticsLayout;
+
         private void Awake()
         {
             Initialize();
@@ -25,11 +35,13 @@ namespace Content.Scripts.GameCore.Entry
         {
             var localCamera = InitializeSceneComponents();
             var configLoader = new ConfigLoader();
-            
+
             var playerConfig = configLoader.LoadConfig<PlayerConfig>(ResourcesPathService.PlayerConfigPath);
             var ufoConfig = configLoader.LoadConfig<UfoConfig>(ResourcesPathService.UfoConfigPath);
-            var smallAsteroidConfig = configLoader.LoadConfig<SmallAsteroidConfig>(ResourcesPathService.SmallAsteroidConfigPath);
-            var bigAsteroidConfig = configLoader.LoadConfig<BigAsteroidConfig>(ResourcesPathService.BigAsteroidConfigPath);
+            var smallAsteroidConfig =
+                configLoader.LoadConfig<SmallAsteroidConfig>(ResourcesPathService.SmallAsteroidConfigPath);
+            var bigAsteroidConfig =
+                configLoader.LoadConfig<BigAsteroidConfig>(ResourcesPathService.BigAsteroidConfigPath);
             var bulletConfig = configLoader.LoadConfig<BulletConfig>(ResourcesPathService.BulletConfigPath);
             var laserConfig = configLoader.LoadConfig<LaserConfig>(ResourcesPathService.LaserConfigPath);
 
@@ -46,47 +58,86 @@ namespace Content.Scripts.GameCore.Entry
             bulletsRoot.parent = poolsRoot;
             lasersRoot.parent = poolsRoot;
 
-            var teleportService = new TeleportService(localCamera);
-            var poolService = new PoolService<IView>();
+            var portalService = new PortalService(localCamera);
+            _localPoolService = new PoolService<IView>();
 
-            var ufoPool = poolService.Preload(ufoConfig.UfoView, ufoRoot, ufoConfig.PoolSize);
-            var smallAsteroidPool = poolService.Preload(smallAsteroidConfig.AsteroidView, smallAsteroidRoot, smallAsteroidConfig.PoolSize);
-            var bigAsteroidPool = poolService.Preload(bigAsteroidConfig.AsteroidView, bigAsteroidRoot, bigAsteroidConfig.PoolSize);
-            var bulletPool = poolService.Preload(bulletConfig.BulletView, bulletsRoot, bulletConfig.PoolSize);
-            var laserPool = poolService.Preload(laserConfig.LaserView, lasersRoot, laserConfig.PoolSize);
+            var ufoPool = _localPoolService.Preload(ufoConfig.UfoView, ufoRoot, ufoConfig.PoolSize);
+            var smallAsteroidPool = _localPoolService.Preload(smallAsteroidConfig.AsteroidView, smallAsteroidRoot,
+                smallAsteroidConfig.PoolSize);
+            var bigAsteroidPool = _localPoolService.Preload(bigAsteroidConfig.AsteroidView, bigAsteroidRoot,
+                bigAsteroidConfig.PoolSize);
+            var bulletPool = _localPoolService.Preload(bulletConfig.BulletView, bulletsRoot, bulletConfig.PoolSize);
+            var laserPool = _localPoolService.Preload(laserConfig.LaserView, lasersRoot, laserConfig.PoolSize);
 
-            var playerModel = new PlayerModel(playerConfig, teleportService);
+            var playerModel = new PlayerModel(playerConfig, portalService);
             var gunModel = new GunModel(bulletPool, laserPool, bulletsRoot, lasersRoot);
-            var gunController = new GunController(gunModel, bulletConfig, teleportService);
+            var gunController = new GunController(gunModel, bulletConfig, portalService);
             var playerView = Instantiate(playerConfig.PlayerView);
             playerView.Initialize();
-            
-            var playerController = new PlayerController(playerModel, playerView, gunModel);
 
-            var ufoModel = new UfoModel(ufoPool);
-            var smallAsteroidModel = new SmallAsteroidModel(smallAsteroidPool);
-            var bigAsteroidModel = new BigAsteroidModel(bigAsteroidPool);
-            var enemyModel = new EnemyModel(ufoPool, smallAsteroidPool, bigAsteroidPool, ufoRoot, smallAsteroidRoot, bigAsteroidRoot);
-            var enemyController = new EnemyController(ufoModel, smallAsteroidModel, bigAsteroidModel);
+            _localPlayerController = new PlayerController(playerModel, playerView, gunModel);
+
+            var enemyModel = new EnemyModel(ufoPool, smallAsteroidPool, bigAsteroidPool, ufoRoot, smallAsteroidRoot,
+                bigAsteroidRoot);
+            _localEnemyController = new EnemyController(enemyModel, playerView, ufoConfig, bigAsteroidConfig,
+                smallAsteroidConfig, portalService);
+
+            InitializeGameListeners(_localPlayerController);
         }
 
         private Camera InitializeSceneComponents()
         {
             var eventSystemPrefab = Resources.Load<GameObject>(ResourcesPathService.EventSystemPath);
             Instantiate(eventSystemPrefab);
-            
+
             var cameraPrefab = Resources.Load<GameObject>(ResourcesPathService.CameraPath);
             var cameraObject = Instantiate(cameraPrefab, new Vector3(0, 0, -10f), Quaternion.identity);
 
             var canvasPrefab = Resources.Load<GameObject>(ResourcesPathService.CanvasPath);
             var canvasObject = Instantiate(canvasPrefab);
-            
+            var loseLayout = canvasObject.transform.GetComponentInChildren<LoseLayout>();
+            var statisticsLayout = canvasObject.transform.GetComponentInChildren<StatisticsLayout>();
+
             var localCamera = cameraObject.GetComponent<Camera>();
             var canvas = canvasObject.GetComponent<Canvas>();
-            
+
             canvas.worldCamera = localCamera;
+            _loseLayout = loseLayout;
+            _statisticsLayout = statisticsLayout;
+
+            _loseLayout.Initialize();
+            _loseLayout.OnRetryClicked += RestartGame;
 
             return localCamera;
+        }
+
+        private void InitializeGameListeners(PlayerController player)
+        {
+            player.OnDeath += ShowDeath;
+        }
+
+        private void RestartGame()
+        {
+            var currentSceneName = SceneManager.GetActiveScene().name;
+            SceneManager.LoadScene(currentSceneName);
+        }
+
+        private void ShowDeath()
+        {
+            _loseLayout.SwitchLayout(true);
+            _localPlayerController.UnsubscribeFromListeners();
+            _localEnemyController.TokenSource.Cancel();
+            _localPoolService.DespawnAll();
+        }
+
+        private void OnApplicationQuit()
+        {
+            try
+            {
+                _localPoolService.DespawnAll();
+                _localEnemyController.TokenSource?.Cancel();
+            }
+            catch (ObjectDisposedException) { }
         }
     }
 }

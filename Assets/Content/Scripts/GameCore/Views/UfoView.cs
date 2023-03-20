@@ -1,20 +1,21 @@
+using System;
 using Content.Scripts.Base.Interfaces;
 using UnityEngine;
 
 namespace Content.Scripts.GameCore.Views
 {
-    public class UfoView : MonoBehaviour, IView
+    public class UfoView : MonoBehaviour, IView, IEnemy
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        public Action OnDestroy;
         
+        public void SetPosition(Vector2 position)
+        {
+            transform.position = position;
         }
 
-        // Update is called once per frame
-        void Update()
+        public void Destroy()
         {
-        
+            OnDestroy?.Invoke();
         }
     }
 }

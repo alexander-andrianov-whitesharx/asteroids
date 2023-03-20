@@ -10,13 +10,13 @@ namespace Content.Scripts.GameCore.Controllers
     {
         private readonly GunModel _gunModel;
         private readonly BulletConfig _bulletConfig;
-        private readonly TeleportService _teleportService;
+        private readonly PortalService _portalService;
         
-        public GunController(GunModel gunModel, BulletConfig bulletConfig, TeleportService teleportService)
+        public GunController(GunModel gunModel, BulletConfig bulletConfig, PortalService portalService)
         {
             _gunModel = gunModel;
             _bulletConfig = bulletConfig;
-            _teleportService = teleportService;
+            _portalService = portalService;
 
             InitializeListeners();
         }
@@ -29,7 +29,7 @@ namespace Content.Scripts.GameCore.Controllers
 
         private void ShootBullet(Transform parent, Vector2 position, Vector2 direction)
         {
-            var bulletModel = new BulletModel(_bulletConfig, direction, _teleportService);
+            var bulletModel = new BulletModel(_bulletConfig, direction, _portalService);
             var bulletView = _gunModel.BulletPool.Spawn(parent, position, Quaternion.identity);
             var bulletController = new BulletController(bulletModel, (BulletView)bulletView);
 
@@ -39,6 +39,7 @@ namespace Content.Scripts.GameCore.Controllers
         private void DespawnBullet(BulletController bulletController)
         {
             _gunModel.BulletPool.Despawn(bulletController.BulletView);
+            bulletController.Dispose();
             
             bulletController.OnBulletDespawn -= DespawnBullet;
         }
