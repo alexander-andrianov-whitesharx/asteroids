@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0516be160ddc1d4bb34ab8e98e985c0, type: 3}
+  m_Name: SmallAsteroidConfig
+  m_EditorClassIdentifier: 
+  asteroidView: {fileID: 1293959710274880089, guid: ab0cc0854246d844b9218ed9ce34ba1f, type: 3}
+  speed: 3
+  angle: 30
+  rewardAmount: 25
+  poolSize: 20
