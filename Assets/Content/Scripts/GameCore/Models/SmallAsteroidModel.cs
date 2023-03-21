@@ -1,6 +1,5 @@
 using System;
-using Content.Scripts.Base.Interfaces;
-using Content.Scripts.Configs;
+using Content.Scripts.GameCore.Configs;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
 
@@ -10,15 +9,19 @@ namespace Content.Scripts.GameCore.Models
     {
         public Action<Vector2> OnPositionUpdate;
 
-        private PortalService _portalService;
-        private Vector2 _direction;
+        private readonly PortalService _portalService;
+        private readonly Vector2 _direction;
 
-        private float _speed;
+        private readonly int _reward;
+        private readonly float _speed;
 
         private bool _wasInsideViewport;
+        
+        public int Reward => _reward;
 
         public SmallAsteroidModel(SmallAsteroidConfig config, PortalService portalService, Vector2 direction)
         {
+            _reward = config.RewardAmount;
             _speed = config.Speed;
             _portalService = portalService;
             _direction = direction;

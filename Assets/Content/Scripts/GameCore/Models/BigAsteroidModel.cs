@@ -1,6 +1,6 @@
 using System;
 using Content.Scripts.Base.Interfaces;
-using Content.Scripts.Configs;
+using Content.Scripts.GameCore.Configs;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
 
@@ -10,22 +10,22 @@ namespace Content.Scripts.GameCore.Models
     {
         public Action<Vector2> OnPositionUpdate;
 
-        private PortalService _portalService;
-        private Vector2 _direction;
+        private readonly PortalService _portalService;
+        private readonly Vector2 _direction;
 
-        private float _speed;
-        private float _spawnDelay;
+        private readonly int _reward;
+        private readonly float _speed;
+        private bool _wasInsideViewport;
 
-        private bool _wasInsideViewport = false;
-
+        public int Reward => _reward;
         public Vector2 Direction => _direction;
 
         public BigAsteroidModel(BigAsteroidConfig config, PortalService portalService,
             Vector2 direction)
         {
             _speed = config.Speed;
-            _spawnDelay = config.SpawnDelay;
             _portalService = portalService;
+            _reward = config.RewardAmount;
             _direction = direction;
         }
 

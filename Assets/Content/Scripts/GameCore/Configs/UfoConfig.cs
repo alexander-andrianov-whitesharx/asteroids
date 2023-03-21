@@ -1,23 +1,23 @@
 using Content.Scripts.GameCore.Views;
 using UnityEngine;
 
-namespace Content.Scripts.Configs
+namespace Content.Scripts.GameCore.Configs
 {
-    [CreateAssetMenu(fileName = "BigAsteroidConfig", menuName = "Game Configs/Big Asteroid")]
-    public class BigAsteroidConfig : ScriptableObject
+    [CreateAssetMenu(fileName = "UfoConfig", menuName = "Game Configs/Ufo Config")]
+    public class UfoConfig : ScriptableObject
     {
-        [SerializeField] private BigAsteroidView asteroidView;
+        [SerializeField] private UfoView ufoView;
 
         [SerializeField] private float speed;
         [SerializeField] private float spawnDelay;
-        [SerializeField] private int rewardAmount;
         [SerializeField] private int spawnLimit;
+        [SerializeField] private int rewardAmount;
         [SerializeField] private int poolSize;
-        
-        public BigAsteroidView AsteroidView => asteroidView;
 
-        public float SpawnDelay => spawnDelay;
+        public UfoView UfoView => ufoView;
+
         public float Speed => speed;
+        public float SpawnDelay => spawnDelay;
         public int SpawnLimit => spawnLimit;
         public int RewardAmount => rewardAmount;
         public int PoolSize => poolSize;

@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   asteroidView: {fileID: 1293959710274880089, guid: ab0cc0854246d844b9218ed9ce34ba1f, type: 3}
   speed: 3
+  angle: 30
   rewardAmount: 25
   poolSize: 20

@@ -7,11 +7,11 @@ namespace Content.Scripts.GameCore.Controllers
 {
     public class UfoController : IDisposable
     {
-        public Action<UfoView, UfoController> OnDestroyView;
+        public Action<UfoView, UfoController, int> OnDestroyView;
 
-        private UfoView _ufoView;
-        private UfoModel _ufoModel;
-        private EnemyController _enemyController;
+        private readonly UfoView _ufoView;
+        private readonly UfoModel _ufoModel;
+        private readonly EnemyController _enemyController;
 
         public UfoController(UfoView ufoView, UfoModel ufoModel, EnemyController enemyController)
         {
@@ -36,7 +36,7 @@ namespace Content.Scripts.GameCore.Controllers
 
         private void OnDestroy()
         {
-            OnDestroyView?.Invoke(_ufoView, this);
+            OnDestroyView?.Invoke(_ufoView, this, _ufoModel.Reward);
         }
 
         public void Dispose()

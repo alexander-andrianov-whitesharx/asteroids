@@ -7,7 +7,7 @@ namespace Content.Scripts.GameCore.Controllers
 {
     public class SmallAsteroidController
     {
-        public Action<SmallAsteroidView, SmallAsteroidController> OnDestroyView;
+        public Action<SmallAsteroidView, SmallAsteroidController, int> OnDestroyView;
         
         private readonly SmallAsteroidView _smallAsteroidView;
         private readonly SmallAsteroidModel _smallAsteroidModel;
@@ -39,7 +39,7 @@ namespace Content.Scripts.GameCore.Controllers
         
         private void OnDestroy()
         {
-            OnDestroyView?.Invoke(_smallAsteroidView, this);
+            OnDestroyView?.Invoke(_smallAsteroidView, this, _smallAsteroidModel.Reward);
         }
 
         public void Dispose()

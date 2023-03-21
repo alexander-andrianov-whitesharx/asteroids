@@ -1,5 +1,5 @@
 using System;
-using Content.Scripts.Configs;
+using Content.Scripts.GameCore.Configs;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
 
@@ -7,22 +7,22 @@ namespace Content.Scripts.GameCore.Models
 {
     public class PlayerModel
     {
-        public Action OnPositionUpdate;
+        public Action<float> OnPositionUpdate;
         public Action OnRotationUpdate;
 
-        private PortalService _portalService;
+        private readonly PortalService _portalService;
+        
+        private readonly float _movementSpeed;
+        private readonly float _rotationSpeed;
+        private readonly float _slowdownTime;
+        private readonly float _accelerateDuration;
+        private readonly float _accelerationMax;
         
         private Vector2 _position;
         private Vector2 _accelerationDirection;
         private Vector2 _localAcceleration;
         
-        private float _movementSpeed;
         private float _rotation;
-        private float _rotationSpeed;
-        private float _slowdownTime;
-        private float _accelerateDuration;
-        private float _accelerationMax;
-        private int _laserLimit;
         
         public Vector2 AccelerationDirection
         {
@@ -39,7 +39,6 @@ namespace Content.Scripts.GameCore.Models
             _movementSpeed = config.MovementSpeed;
             _rotationSpeed = config.RotationSpeed;
             _slowdownTime = config.SlowdownTime;
-            _laserLimit = config.MaxLaserAmount;
             _accelerateDuration = config.AccelerationTime;
             _accelerationMax = config.AccelerationLimit;
 
@@ -79,7 +78,7 @@ namespace Content.Scripts.GameCore.Models
             _position = newPosition;
             _position = _portalService.CalculateNextPosition(_position);
             
-            OnPositionUpdate?.Invoke();
+            OnPositionUpdate?.Invoke(deltaTime);
         }
     }
 }

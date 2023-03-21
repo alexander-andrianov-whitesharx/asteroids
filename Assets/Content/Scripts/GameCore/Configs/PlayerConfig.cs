@@ -1,7 +1,7 @@
 using Content.Scripts.GameCore.Views;
 using UnityEngine;
 
-namespace Content.Scripts.Configs
+namespace Content.Scripts.GameCore.Configs
 {
     [CreateAssetMenu(fileName = "PlayerConfig", menuName = "Game Configs/Player Config")]
     public class PlayerConfig : ScriptableObject

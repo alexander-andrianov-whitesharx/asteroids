@@ -1,5 +1,4 @@
-
-namespace Content.Scripts.Configs
+namespace Content.Scripts.GameCore.Configs
 {
     public static class ResourcesPathService
     {

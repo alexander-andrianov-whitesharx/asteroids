@@ -1,4 +1,3 @@
-using System;
 using Content.Scripts.Base.Interfaces;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
@@ -7,13 +6,13 @@ namespace Content.Scripts.GameCore.Models
 {
     public class EnemyModel
     {
-        private Pool<IView> _ufoPool;
-        private Pool<IView> _smallAsteroidsPool;
-        private Pool<IView> _bigAsteroidsPool;
+        private readonly Pool<IView> _ufoPool;
+        private readonly Pool<IView> _smallAsteroidsPool;
+        private readonly Pool<IView> _bigAsteroidsPool;
 
-        private Transform _ufoRoot;
-        private Transform _smallAsteroidsRoot;
-        private Transform _bigAsteroidsRoot;
+        private readonly Transform _ufoRoot;
+        private readonly Transform _smallAsteroidsRoot;
+        private readonly Transform _bigAsteroidsRoot;
         
         private Vector2 _playerPosition;
 

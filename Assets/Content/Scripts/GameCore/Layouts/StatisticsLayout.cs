@@ -1,18 +1,64 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Text;
+using TMPro;
 using UnityEngine;
 
-public class StatisticsLayout : MonoBehaviour
+namespace Content.Scripts.GameCore.Layouts
 {
-    // Start is called before the first frame update
-    void Start()
+    public class StatisticsLayout : MonoBehaviour
     {
-        
-    }
+        private const string PositionPrefix = "player position: ";
+        private const string RotationPrefix = "player rotation: ";
+        private const string SpeedPrefix = "player speed: ";
+        private const string LaserBulletsPrefix = "laser bullets: ";
+        private const string LaserRestoreTimePrefix = "laser recovery time: ";
 
-    // Update is called once per frame
-    void Update()
-    {
+        [SerializeField] private TextMeshProUGUI positionText;
+        [SerializeField] private TextMeshProUGUI rotationText;
+        [SerializeField] private TextMeshProUGUI speedText;
+        [SerializeField] private TextMeshProUGUI laserBulletsText;
+        [SerializeField] private TextMeshProUGUI restoreTimeText;
+
+        public void Initialize(string limitText, string amountText, string restoreText)
+        {
+            UpdateLaserText(limitText, amountText);
+            UpdateRestoreTimeText(restoreText);
+        }
+
+        public void UpdatePositionText(string text)
+        {
+            UpdateText(positionText, PositionPrefix, text);
+        }
+            
+        public void UpdateRotationText(string text)
+        {
+            UpdateText(rotationText, RotationPrefix, text);
+        }
         
+        public void UpdateSpeedText(string text)
+        {
+            UpdateText(speedText, SpeedPrefix, text);
+        }
+        
+        public void UpdateRestoreTimeText(string text)
+        {
+            UpdateText(restoreTimeText, LaserRestoreTimePrefix, text);
+        }
+        
+        public void UpdateLaserText(string limitText, string amountText)
+        {
+            var initialString = new StringBuilder(amountText);
+            initialString.Append(", ");
+            initialString.Append(limitText);
+            
+            UpdateText(laserBulletsText, LaserBulletsPrefix, initialString.ToString());
+        }
+
+        private void UpdateText(TextMeshProUGUI text, string prefix, string value)
+        {
+            var updatedScoreText = new StringBuilder(prefix);
+            updatedScoreText.Append(value);
+
+            text.text = updatedScoreText.ToString();
+        }
     }
 }

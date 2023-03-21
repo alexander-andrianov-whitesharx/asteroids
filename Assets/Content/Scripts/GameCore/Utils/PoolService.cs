@@ -52,14 +52,14 @@ namespace Content.Scripts.GameCore.Utils
             return objectPool;
         }
 
-        public T Spawn(T prefab, Transform parent, Vector3 position, Quaternion rotation)
+        private T Spawn(T prefab, Transform parent, Vector3 position, Quaternion rotation)
         {
             GetPool(prefab);
 
             return _pools[prefab].Spawn(parent, position, rotation);
         }
 
-        public void Despawn(T currentObject)
+        private void Despawn(T currentObject)
         {
             var currentTemp = currentObject as MonoBehaviour;
             

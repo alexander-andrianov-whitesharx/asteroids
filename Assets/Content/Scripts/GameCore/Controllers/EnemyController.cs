@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Content.Scripts.Configs;
+using Content.Scripts.GameCore.Configs;
 using Content.Scripts.GameCore.Models;
 using Content.Scripts.GameCore.Utils;
 using Content.Scripts.GameCore.Views;
@@ -12,10 +12,9 @@ namespace Content.Scripts.GameCore.Controllers
     public class EnemyController
     {
         public Action<Vector2, float> OnUpdatePlayerPosition;
+        public Action<int> OnUpdateScore;
 
         private readonly EnemyModel _enemyModel;
-        private readonly PlayerView _playerView;
-
         private readonly UfoConfig _ufoConfig;
         private readonly BigAsteroidConfig _bigAsteroidConfig;
         private readonly SmallAsteroidConfig _smallAsteroidConfig;
@@ -32,13 +31,12 @@ namespace Content.Scripts.GameCore.Controllers
             BigAsteroidConfig bigConfig, SmallAsteroidConfig smallConfig, PortalService portalService)
         {
             _enemyModel = enemyModel;
-            _playerView = playerView;
             _ufoConfig = ufoConfig;
             _bigAsteroidConfig = bigConfig;
             _smallAsteroidConfig = smallConfig;
             _portalService = portalService;
 
-            _playerView.OnUpdatePosition += OnUpdatePosition;
+            playerView.OnUpdatePosition += OnUpdatePosition;
 
             _cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = _cancellationTokenSource.Token;
@@ -75,11 +73,11 @@ namespace Content.Scripts.GameCore.Controllers
             asteroidController.OnDestroyView += DestroyBigAsteroid;
         }
         
-        private void ExplodeBigAsteroid(Vector3 upperAxis, Vector2 spawnPoint, Vector2 direction)
+        private void ExplodeBigAsteroid(Vector3 upperAxis, Vector2 spawnPoint, Vector2 direction, float angle)
         {
             var axis = Vector3.Cross(direction, upperAxis);
-            var leftDirection = Quaternion.AngleAxis(35, axis) * direction;
-            var rightDirection = Quaternion.AngleAxis(-35, axis) * direction;
+            var leftDirection = Quaternion.AngleAxis(angle, axis) * direction;
+            var rightDirection = Quaternion.AngleAxis(-angle, axis) * direction;
 
             GenerateSmallAsteroid(spawnPoint, leftDirection);
             GenerateSmallAsteroid(spawnPoint, rightDirection);
@@ -155,34 +153,40 @@ namespace Content.Scripts.GameCore.Controllers
             }
         }
 
-        private void DestroyUfo(UfoView view, UfoController controller)
+        private void DestroyUfo(UfoView view, UfoController controller, int reward)
         {
             controller.OnDestroyView -= DestroyUfo;
             controller.Dispose();
             
             _enemyModel.UfoPool.Despawn(view);
             _generatedUfos--;
+            
+            OnUpdateScore?.Invoke(reward);
         }
         
-        private void DestroyBigAsteroid(BigAsteroidView view, BigAsteroidController controller, Vector2 direction)
+        private void DestroyBigAsteroid(BigAsteroidView view, BigAsteroidController controller, Vector2 direction, int reward)
         {
             var asteroidTransform = view.transform;
             var asteroidPosition = asteroidTransform.position;
-            ExplodeBigAsteroid(-asteroidTransform.up,asteroidPosition, direction);
+            ExplodeBigAsteroid(-asteroidTransform.up,asteroidPosition, direction, _smallAsteroidConfig.Angle);
 
             controller.OnDestroyView -= DestroyBigAsteroid;
             controller.Dispose();
             
             _enemyModel.BigAsteroidsPool.Despawn(view);
             _generatedAsteroids--;
+            
+            OnUpdateScore?.Invoke(reward);
         }
         
-        private void DestroySmallAsteroid(SmallAsteroidView view, SmallAsteroidController controller)
+        private void DestroySmallAsteroid(SmallAsteroidView view, SmallAsteroidController controller, int reward)
         {
             controller.OnDestroyView -= DestroySmallAsteroid;
             controller.Dispose();
             
             _enemyModel.SmallAsteroidsPool.Despawn(view);
+            
+            OnUpdateScore?.Invoke(reward);
         }
     }
 }

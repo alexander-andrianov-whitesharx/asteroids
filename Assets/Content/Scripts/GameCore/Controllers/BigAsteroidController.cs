@@ -7,10 +7,10 @@ namespace Content.Scripts.GameCore.Controllers
 {
     public class BigAsteroidController : IDisposable
     {
-        public Action<BigAsteroidView, BigAsteroidController, Vector2> OnDestroyView;
+        public Action<BigAsteroidView, BigAsteroidController, Vector2, int> OnDestroyView;
         
-        private BigAsteroidView _bigAsteroidView;
-        private BigAsteroidModel _bigAsteroidModel;
+        private readonly BigAsteroidView _bigAsteroidView;
+        private readonly BigAsteroidModel _bigAsteroidModel;
         
         public BigAsteroidController(BigAsteroidView view, BigAsteroidModel model)
         {
@@ -39,7 +39,7 @@ namespace Content.Scripts.GameCore.Controllers
         
         private void OnDestroy()
         {
-            OnDestroyView?.Invoke(_bigAsteroidView, this, _bigAsteroidModel.Direction);
+            OnDestroyView?.Invoke(_bigAsteroidView, this, _bigAsteroidModel.Direction, _bigAsteroidModel.Reward);
         }
 
         public void Dispose()

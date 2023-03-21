@@ -1,5 +1,5 @@
 using System;
-using Content.Scripts.Configs;
+using Content.Scripts.GameCore.Configs;
 using Content.Scripts.GameCore.Utils;
 using UnityEngine;
 

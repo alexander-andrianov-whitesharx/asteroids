@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: LaserConfig
   m_EditorClassIdentifier: 
   laserView: {fileID: 1708846704254676693, guid: 0457bd4ce5d520c40abfc72975816eb9, type: 3}
-  duration: 1
-  poolSize: 4
+  duration: 0.5
+  recoveryTime: 3
+  laserLimit: 3
+  poolSize: 3

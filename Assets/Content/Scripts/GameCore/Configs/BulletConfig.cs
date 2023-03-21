@@ -1,7 +1,7 @@
 using Content.Scripts.GameCore.Views;
 using UnityEngine;
 
-namespace Content.Scripts.Configs
+namespace Content.Scripts.GameCore.Configs
 {
     [CreateAssetMenu(fileName = "BulletConfig", menuName = "Game Configs/Bullet Config")]
     public class BulletConfig : ScriptableObject

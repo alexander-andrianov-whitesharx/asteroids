@@ -1,24 +1,22 @@
 using System.Collections.Generic;
-using System.Linq;
 using Content.Scripts.Base.Enums;
 using Content.Scripts.Base.Interfaces;
 using Content.Scripts.GameCore.Views;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Content.Scripts.GameCore.Utils
 {
     public class Pool<T>
     {
-        private Stack<T> inactive;
-        private List<T> active;
-        private T prefab;
+        private readonly Stack<T> _inactive;
+        private readonly List<T> _active;
+        private readonly T _prefab;
 
         public Pool(T prefab, int initialQty)
         {
-            this.prefab = prefab;
-            inactive = new Stack<T>(initialQty);
-            active = new List<T>();
+            _prefab = prefab;
+            _inactive = new Stack<T>(initialQty);
+            _active = new List<T>();
         }
 
         public T Spawn(Transform parent, Vector3 position, Quaternion rotation)
@@ -26,9 +24,9 @@ namespace Content.Scripts.GameCore.Utils
             T currentObject;
             GameObject currentGameObject;
             
-            if (inactive.Count == 0)
+            if (_inactive.Count == 0)
             {
-                var currentMonoBehaviour = Object.Instantiate(prefab as MonoBehaviour, position, rotation, parent);
+                var currentMonoBehaviour = Object.Instantiate(_prefab as MonoBehaviour, position, rotation, parent);
 
                 currentGameObject = currentMonoBehaviour.gameObject;
                 currentObject = currentGameObject.GetComponent<T>();
@@ -41,8 +39,8 @@ namespace Content.Scripts.GameCore.Utils
             }
             else
             {
-                currentObject = inactive.Pop();
-                active.Add(currentObject);
+                currentObject = _inactive.Pop();
+                _active.Add(currentObject);
 
                 currentGameObject = (currentObject as MonoBehaviour)!.gameObject;
 
@@ -69,13 +67,13 @@ namespace Content.Scripts.GameCore.Utils
             }
             
             currentGameObject.gameObject.SetActive(false);
-            inactive.Push(currentObject);
-            active.Remove(currentObject);
+            _inactive.Push(currentObject);
+            _active.Remove(currentObject);
         }
         
         public void DespawnAll()
         {
-            foreach (var poolMember in active.ToArray())
+            foreach (var poolMember in _active.ToArray())
             {
                 Despawn(poolMember);
             }
