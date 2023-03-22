@@ -177,4 +177,4 @@ Console.WriteLine($"My name is {me.Name}");
 
 ### Inspired by:
 
-- https://www.dofactory.com/reference/csharp-coding-standards
+- https://google.github.io/styleguide/csharp-style.html
