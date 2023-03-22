@@ -9,3 +9,7 @@ The objective of "asteroids" is to destroy asteroids and saucers. The player con
  * MVC architectural pattern;
  * Assembly definitions;
  * Generic pool object pattern and etc.
+
+# gameplay overview
+ 
+ ![](https://github.com/alexander-andrianov-whitesharx/asteroids/blob/main/asteroids-gameplay.gif)
